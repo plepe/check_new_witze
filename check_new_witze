@@ -1,0 +1,35 @@
+#!/bin/bash
+
+. ~/.check_new_witze.rc
+
+cd $CHECK_DIR
+rm -f $TMPFILE
+find . > .listing.new
+
+X=`diff .listing .listing.new | egrep "^> " | cut -b5- | grep -v "^\."`
+if [ "$X" != "" ] ; then
+  echo "Neue Dateien im Witze-Verzeichnis:" >> $TMPFILE
+  echo "$X" | sed "s/^/  /" >> $TMPFILE
+  echo >> $TMPFILE
+fi
+
+X=`diff .listing .listing.new | egrep "^< " | cut -b5- | grep -v "^\."`
+if [ "$X" != "" ] ; then
+  echo "Dateien verschwunden aus Witze-Verzeichnis:" >> $TMPFILE
+  echo "$X" | sed "s/^/  /" >> $TMPFILE
+  echo >> $TMPFILE
+fi
+
+mv .listing.new .listing
+
+if [ -f $TMPFILE ] ; then
+  echo "From: Stephan Plepelits <skunk@xover.mud.at>" > $TMPFILE.1
+  echo "To: witze.empfaenger@xover.mud.at" >> $TMPFILE.1
+  echo "Subject: Check ~skunk/witze Directory" >> $TMPFILE.1
+  echo >> $TMPFILE.1
+  cat $TMPFILE >> $TMPFILE.1
+
+  /usr/lib/sendmail $MAILTO < $TMPFILE.1
+  rm $TMPFILE
+  rm $TMPFILE.1
+fi

@@ -1,0 +1,3 @@
+TMPFILE="/tmp/check_witze"
+MAILTO="user1,user2"
+CHECK_DIR=~/witze
